@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "package": "com.blamejared.fabriccontrolling.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "OpenGuiMixin",
+    "TEst"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "id": "fabriccontrolling",
+  "name": "Fabric Controlling",
+  "version": "1.0.0",
+  "side": "universal",
+  "initializer": "com.blamejared.fabriccontrolling.Controlling",
+  "mixins": {
+    "client": "fabriccontrolling.client.json",
+    "common": "fabriccontrolling.common.json",
+    "server": "fabriccontrolling.server.json"
+  }
+}
