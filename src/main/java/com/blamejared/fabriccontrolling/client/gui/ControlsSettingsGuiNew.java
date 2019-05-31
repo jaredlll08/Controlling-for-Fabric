@@ -1,30 +1,28 @@
 package com.blamejared.fabriccontrolling.client.gui;
 
 import net.fabricmc.api.*;
-import net.minecraft.client.gui.Screen;
-import net.minecraft.client.gui.menu.options.ControlsOptionsScreen;
+import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.menu.options.*;
 import net.minecraft.client.gui.widget.*;
 import net.minecraft.client.options.*;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.text.TranslatableTextComponent;
 import net.minecraft.util.SystemUtil;
-import sun.plugin2.message.Message;
 
 import java.util.Iterator;
 import java.util.function.Predicate;
 
+@SuppressWarnings("ALL")
 @Environment(EnvType.CLIENT)
 public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     
-    private static final KeyBinding[] SETTINGS;
     private final Screen parent;
-    private final GameOptions settings;
-    private KeyBindingListWidgetNew keyBindList;
+    private final GameOptions options;
+    private KeyBindingListWidgetNew keyBindingListWidget;
     private ButtonWidget resetButton;
     
-    private TextFieldWidget search;
     
+    private TextFieldWidget search;
     private String lastSearch;
     private DisplayType displayType;
     public ButtonWidget noneBtn;
@@ -35,17 +33,22 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     public ControlsSettingsGuiNew(Screen var1, GameOptions var2) {
         super(var1, var2);
         this.parent = var1;
-        this.settings = var2;
+        this.options = var2;
     }
     
-    protected void onInitialized() {
+    protected void init() {
         this.lastSearch = "";
         displayType = DisplayType.ALL;
         searchType = SearchType.NAME;
         this.search = new TextFieldWidget(font, this.width / 2 - 154, this.height - 29 - 23, 148, 18, "");
-        this.keyBindList = new KeyBindingListWidgetNew(this, this.minecraft);
-        this.children.add(this.keyBindList);
-        this.setFocused(this.keyBindList);
+        this.keyBindingListWidget = new KeyBindingListWidgetNew(this, this.minecraft);
+        this.children.add(this.keyBindingListWidget);
+        this.setFocused(this.keyBindingListWidget);
+        this.addButton(new ButtonWidget(this.width / 2 - 155, 18, 150, 20, I18n.translate("options.mouse_settings"), (buttonWidget_1) -> {
+            this.minecraft.openScreen(new MouseOptionsScreen(this));
+        }));
+        this.addButton(GameOption.AUTO_JUMP.createOptionButton(this.minecraft.options, this.width / 2 - 155 + 160, 18, 150));
+        
         this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, "Done", var1 -> ControlsSettingsGuiNew.this.minecraft.openScreen(ControlsSettingsGuiNew.this.parent)));
         conflictBtn = this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29 - 24, 150 / 2, 20, "Show Conflicts", var1 -> {
             if(displayType == DisplayType.CONFLICTS) {
@@ -89,28 +92,29 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         //        this.title = new TranslatableTextComponent("controls.title");;
         int index = 0;
         
-//        for(KeyBinding var5 : SETTINGS) {
-//            if(var5.isSlider()) {
-//                this.addButton(new OptionSliderWidget(var5.getId(), this.width / 2 - 155 + index % 2 * 160, 18 + 24 * (index >> 1), var5));
-//            } else {
-//                this.addButton(new OptionButtonWidget(var5.getId(), this.width / 2 - 155 + index % 2 * 160, 18 + 24 * (index >> 1), var5, this.settings.getTranslatedName(var5)) {
-//                    public void onPressed(double var1, double var3) {
-//                        ControlsSettingsGuiNew.this.settings.updateOption(this.getOption(), 1);
-//                        this.text = ControlsSettingsGuiNew.this.settings.getTranslatedName(KeyBinding.byId(this.id));
-//                    }
-//                });
-//            }
-//            ++index;
-//        }
+        //        for(KeyBinding var5 : SETTINGS) {
+        //            if(var5.isSlider()) {
+        //                this.addButton(new OptionSliderWidget(var5.getId(), this.width / 2 - 155 + index % 2 * 160, 18 + 24 * (index >> 1), var5));
+        //            } else {
+        //                this.addButton(new OptionButtonWidget(var5.getId(), this.width / 2 - 155 + index % 2 * 160, 18 + 24 * (index >> 1), var5, this.options.getTranslatedName(var5)) {
+        //                    public void onPressed(double var1, double var3) {
+        //                        ControlsSettingsGuiNew.this.options.updateOption(this.getOption(), 1);
+        //                        this.text = ControlsSettingsGuiNew.this.options.getTranslatedName(KeyBinding.byId(this.id));
+        //                    }
+        //                });
+        //            }
+        //            ++index;
+        //        }
     }
     
     
     public void render(int mx, int my, float pt) {
-        this.drawBackground();
-        this.keyBindList.draw(mx, my, pt);
-        this.drawStringCentered(this.font, this.title, this.width / 2, 8, 16777215);
+        
+        this.renderBackground();
+        this.keyBindingListWidget.render(mx, my, pt);
+        this.drawCenteredString(this.font, this.title.getFormattedText(), this.width / 2, 8, 16777215);
         boolean changed = false;
-        KeyBinding[] keys = this.settings.keysAll;
+        KeyBinding[] keys = this.options.keysAll;
         
         for(KeyBinding var8 : keys) {
             if(!var8.isDefault()) {
@@ -119,16 +123,16 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
             }
         }
         
-        this.resetButton.enabled = changed;
+        this.resetButton.active = changed;
         search.render(mx, my, pt);
         superDraw(mx, my, pt);
-        drawStringCentered(font, "Search"/*I18n.translate("options.search")*/, this.width / 2 - (155 / 2), this.height - 29 - 39, 16777215);
+        drawCenteredString(font, "Search"/*I18n.translate("options.search")*/, this.width / 2 - (155 / 2), this.height - 29 - 39, 16777215);
     }
     
     
     @Override
-    public void update() {
-        super.update();
+    public void tick() {
+        super.tick();
         search.tick();
         if(!lastSearch.equals(search.getText())) {
             filterKeys();
@@ -137,31 +141,31 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     
     public void filterKeys() {
         lastSearch = search.getText();
-        keyBindList.getchildren().clear();
+        keyBindingListWidget.children().clear();
         if(displayType == DisplayType.ALL && lastSearch.isEmpty()) {
-            keyBindList.getchildren().addAll(keyBindList.getAllchildren());
+            keyBindingListWidget.children().addAll(keyBindingListWidget.getAllListeners());
             return;
         }
         Predicate<KeyBindingListWidgetNew.KeyEntry> predicate = displayType.getPred();
         if(!lastSearch.isEmpty()) {
             switch(searchType) {
                 case NAME:
-                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.keyDesc).toLowerCase().contains(lastSearch.toLowerCase()));
+                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.bindingName).toLowerCase().contains(lastSearch.toLowerCase()));
                     break;
                 case KEY:
-                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.keyBinding.getName()).toLowerCase().contains(lastSearch.toLowerCase()));
+                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.binding.getName()).toLowerCase().contains(lastSearch.toLowerCase()));
                     break;
                 case CATEGORY:
-                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.keyBinding.method_1423()).toLowerCase().contains(lastSearch.toLowerCase()));
+                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.binding.getCategory()).toLowerCase().contains(lastSearch.toLowerCase()));
                     break;
             }
         }
         
-        for(KeyBindingListWidgetNew.Entry entry : keyBindList.getAllchildren()) {
+        for(KeyBindingListWidgetNew.Entry entry : keyBindingListWidget.getAllListeners()) {
             if(entry instanceof KeyBindingListWidgetNew.KeyEntry) {
                 KeyBindingListWidgetNew.KeyEntry ent = (KeyBindingListWidgetNew.KeyEntry) entry;
                 if(predicate.test(ent)) {
-                    keyBindList.getchildren().add(ent);
+                    keyBindingListWidget.children().add(ent);
                 }
             }
         }
@@ -176,16 +180,20 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     public boolean mouseClicked(double mx, double my, int btn) {
         
         boolean valid;
-        if(this.field_2727 != null) {
-            search.setHasFocus(false);
-            this.settings.method_1641(this.field_2727, InputUtil.Type.KEY_MOUSE.createFromCode(btn));
-            this.field_2727 = null;
-            KeyBinding.method_1426();
+        if(this.focusedBinding != null) {
+            if(search.isFocused()) {
+                search.changeFocus(false);
+            }
+            this.options.setKeyCode(this.focusedBinding, InputUtil.Type.MOUSE.createFromCode(btn));
+            this.focusedBinding = null;
+            KeyBinding.updateKeysByCode();
             valid = true;
-        } else if(btn == 0 && this.keyBindList.mouseClicked(mx, my, btn)) {
-            search.setHasFocus(false);
-            this.setActive(true);
-            this.setFocused(this.keyBindList);
+        } else if(btn == 0 && this.keyBindingListWidget.mouseClicked(mx, my, btn)) {
+            if(search.isFocused()) {
+                search.changeFocus(false);
+            }
+            this.setDragging(true);
+            this.setFocused(this.keyBindingListWidget);
             valid = true;
         } else {
             valid = search.mouseClicked(mx, my, btn);
@@ -203,8 +211,8 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     
     
     public boolean mouseReleased(double mx, double my, int btn) {
-        if(btn == 0 && this.keyBindList.mouseReleased(mx, my, btn)) {
-            this.setActive(false);
+        if(btn == 0 && this.keyBindingListWidget.mouseReleased(mx, my, btn)) {
+            this.setDragging(false);
             return true;
         } else if(search.isFocused()) {
             return search.mouseReleased(mx, my, btn);
@@ -215,19 +223,19 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     
     
     public boolean keyPressed(int var1, int var2, int var3) {
-        if(search.keyPressed(var1, var2, var3)) {
+        if(this.focusedBinding == null && search.keyPressed(var1, var2, var3)) {
             return true;
         }
-        if(this.field_2727 != null) {
+        if(this.focusedBinding != null) {
             if(var1 == 256) {
-                this.settings.method_1641(this.field_2727, InputUtil.field_16237);
+                this.options.setKeyCode(this.focusedBinding, InputUtil.UNKNOWN_KEYCODE);
             } else {
-                this.settings.method_1641(this.field_2727, InputUtil.method_15985(var1, var2));
+                this.options.setKeyCode(this.focusedBinding, InputUtil.getKeyCode(var1, var2));
             }
             
-            this.field_2727 = null;
-            this.field_2723 = SystemUtil.getMeasuringTimeMili();
-            KeyBinding.method_1426();
+            this.focusedBinding = null;
+            this.time = SystemUtil.getMeasuringTimeMs();
+            KeyBinding.updateKeysByCode();
             return true;
         } else {
             return superKeyPressed(var1, var2, var3);
@@ -235,8 +243,8 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     }
     
     public boolean superKeyPressed(int var1, int var2, int var3) {
-        if(var1 == 256 && this.canClose()) {
-            this.close();
+        if(var1 == 256 && this.shouldCloseOnEsc()) {
+            this.onClose();
             return true;
         } else {
             return super.keyPressed(var1, var2, var3);
@@ -244,15 +252,10 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     }
     
     
-    static {
-        SETTINGS = new KeyBinding[] {KeyBinding.INVERT_MOUSE, KeyBinding.SENSITIVITY, KeyBinding.TOUCHSCREEN, KeyBinding.AUTO_JUMP};
-    }
-    
-    
     public boolean superMouseClicked(double var1, double var3, int var5) {
-        Iterator var6 = this.getchildren().iterator();
+        Iterator var6 = this.children().iterator();
         
-        GuiEventListener var7;
+        Element var7;
         boolean var8;
         do
         {
@@ -260,13 +263,13 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
                 return false;
             }
             
-            var7 = (GuiEventListener) var6.next();
+            var7 = (Element) var6.next();
             var8 = var7.mouseClicked(var1, var3, var5);
         } while(!var8);
         
         this.focusOn(var7);
         if(var5 == 0) {
-            this.setActive(true);
+            this.setDragging(true);
         }
         
         return true;
@@ -274,7 +277,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     
     
     public boolean superMouseReleased(double var1, double var3, int var5) {
-        this.setActive(false);
+        this.setDragging(false);
         return superSuperMouseReleased(var1, var3, var5);
     }
     

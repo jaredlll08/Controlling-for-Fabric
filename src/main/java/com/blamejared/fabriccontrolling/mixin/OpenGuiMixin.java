@@ -1,96 +1,77 @@
 package com.blamejared.fabriccontrolling.mixin;
 
 import com.blamejared.fabriccontrolling.client.gui.ControlsSettingsGuiNew;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.audio.SoundLoader;
+import net.minecraft.client.*;
+import net.minecraft.client.audio.*;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.gui.hud.InGameHud;
-import net.minecraft.client.gui.ingame.DeathGui;
-import net.minecraft.client.gui.menu.MultiplayerGui;
-import net.minecraft.client.gui.menu.settings.ControlsSettingsGui;
+import net.minecraft.client.gui.ingame.DeathScreen;
+import net.minecraft.client.gui.menu.MultiplayerScreen;
+import net.minecraft.client.gui.menu.options.ControlsOptionsScreen;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.settings.*;
+import net.minecraft.client.options.*;
 import net.minecraft.client.util.*;
 import net.minecraft.client.world.ClientWorld;
-import net.minecraft.text.TextComponent;
 import org.spongepowered.asm.mixin.*;
 
 @Mixin(MinecraftClient.class)
 public class OpenGuiMixin {
     
     @Shadow
-    public Gui currentGui;
-    
+    public Screen currentScreen;
     @Shadow
     public ClientWorld world;
-    
     @Shadow
     public ClientPlayerEntity player;
-    
     @Shadow
     public GameOptions options;
-    
     @Shadow
-    public InGameHud hudInGame;
-    
+    public InGameHud inGameHud;
     @Shadow
     public Mouse mouse;
-    
-    @Shadow
-    public boolean field_1743;
-    
     @Shadow
     public Window window;
-    
     @Shadow
-    private SoundLoader soundLoader;
+    public boolean skipGameRender;
+    @Shadow
+    private SoundManager soundManager;
     
     /**
-     * @author Jaredlll08
+     * @author
      */
     @Overwrite
-    public void openGui(Gui gui) {
-        if(this.currentGui != null) {
-            this.currentGui.onClosed();
+    public void openScreen(Screen screen_1) {
+        if(this.currentScreen != null) {
+            this.currentScreen.removed();
         }
         
-        if(gui == null && this.world == null) {
-            gui = new MainMenuGui();
-        } else if(gui == null && this.player.getHealth() <= 0.0F) {
-            gui = new DeathGui((TextComponent) null);
+        if(screen_1 == null && this.world == null) {
+            screen_1 = new MainMenuScreen();
+        } else if(screen_1 == null && this.player.getHealth() <= 0.0F) {
+            screen_1 = new DeathScreen(null, this.world.getLevelProperties().isHardcore());
         }
         
-        if(gui instanceof MainMenuGui || gui instanceof MultiplayerGui) {
+        if(screen_1 instanceof MainMenuScreen || screen_1 instanceof MultiplayerScreen) {
             this.options.debugEnabled = false;
-            this.hudInGame.getHudChat().clear(true);
+            this.inGameHud.getChatHud().clear(true);
         }
         
-        if(gui != null && ControlsSettingsGui.class.equals(gui.getClass())) {
-            gui = new ControlsSettingsGuiNew(this.currentGui, MinecraftClient.getInstance().options);
+        if(screen_1 != null && ControlsOptionsScreen.class.equals(screen_1.getClass())) {
+            screen_1 = new ControlsSettingsGuiNew(this.currentScreen, MinecraftClient.getInstance().options);
         }
-        this.currentGui = (Gui) gui;
-        if(gui != null) {
-            this.mouse.method_1610();
-            KeyBinding.method_1437();
-            ((Gui) gui).initialize(MinecraftClient.getInstance(), this.window.getScaledWidth(), this.window.getScaledHeight());
-            this.field_1743 = false;
+        
+        this.currentScreen = screen_1;
+        if(screen_1 != null) {
+            this.mouse.unlockCursor();
+            KeyBinding.unpressAll();
+            screen_1.init(MinecraftClient.getInstance(), this.window.getScaledWidth(), this.window.getScaledHeight());
+            this.skipGameRender = false;
+            NarratorManager.INSTANCE.method_19788(screen_1.getNarrationMessage());
         } else {
-            this.soundLoader.resume();
-            this.mouse.method_1612();
+            this.soundManager.resumeAll();
+            this.mouse.lockCursor();
         }
-        //        if(gui.getClass().equals(ControlsSettingsGui.class)) {
-        //            ControlsSettingsGui cGui = (ControlsSettingsGui) gui;
-        //            try {
-        //                Field parent = cGui.getClass().getDeclaredField("parent");
-        //                parent.setAccessible(true);
-        //                Object o = parent.get(cGui);
-        //                MinecraftClient.getInstance().openGui(new ControlsSettingsGuiNew((Gui) o, MinecraftClient.getInstance().settings));
-        //            } catch(NoSuchFieldException | IllegalAccessException e) {
-        //                e.printStackTrace();
-        //            }
-        //
-        //        } else {
-        //        }
+        
     }
     
     
