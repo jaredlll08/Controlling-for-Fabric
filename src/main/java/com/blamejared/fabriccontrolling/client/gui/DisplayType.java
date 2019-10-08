@@ -11,7 +11,7 @@ public enum DisplayType {
             return false;
         }
         for(KeyBinding keyBinding : MinecraftClient.getInstance().options.keysAll) {
-            if(!keyBinding.getLocalizedName().equalsIgnoreCase(keyEntry.binding.getLocalizedName())) {
+            if(!keyBinding.getId().equals(keyEntry.binding.getId())) {
                 if(keyBinding.getName().equals(keyEntry.binding.getName())) {
                     return true;
                 }
