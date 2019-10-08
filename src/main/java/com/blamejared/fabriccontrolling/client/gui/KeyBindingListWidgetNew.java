@@ -1,15 +1,19 @@
 package com.blamejared.fabriccontrolling.client.gui;
 
-import net.fabricmc.api.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.TextFormat;
+import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidgetNew.Entry> {
@@ -128,9 +132,9 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
             }
             
             if(boolean_2) {
-                this.editButton.setMessage(TextFormat.WHITE + "> " + TextFormat.YELLOW + this.editButton.getMessage() + TextFormat.WHITE + " <");
+                this.editButton.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.editButton.getMessage() + Formatting.WHITE + " <");
             } else if(boolean_3) {
-                this.editButton.setMessage(TextFormat.RED + this.editButton.getMessage());
+                this.editButton.setMessage(Formatting.RED + this.editButton.getMessage());
             }
             
             this.editButton.render(int_6, int_7, float_1);

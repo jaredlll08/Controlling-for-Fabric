@@ -3,14 +3,14 @@ package com.blamejared.fabriccontrolling.client.gui;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Screen;
-import net.minecraft.client.gui.menu.options.ControlsOptionsScreen;
-import net.minecraft.client.gui.menu.options.MouseOptionsScreen;
+import net.minecraft.client.gui.screen.MouseOptionsScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.controls.ControlsOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.options.GameOption;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.options.Option;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.SystemUtil;
@@ -53,7 +53,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         this.addButton(new ButtonWidget(this.width / 2 - 155, 18, 150, 20, I18n.translate("options.mouse_settings"), (buttonWidget_1) -> {
             this.minecraft.openScreen(new MouseOptionsScreen(this));
         }));
-        this.addButton(GameOption.AUTO_JUMP.createOptionButton(this.minecraft.options, this.width / 2 - 155 + 160, 18, 150));
+        this.addButton(Option.AUTO_JUMP.createButton(this.minecraft.options, this.width / 2 - 155 + 160, 18, 150));
         
         this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, "Done", var1 -> ControlsSettingsGuiNew.this.minecraft.openScreen(ControlsSettingsGuiNew.this.parent)));
         conflictBtn = this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29 - 24, 150 / 2, 20, "Show Conflicts", var1 -> {
@@ -118,7 +118,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         
         this.renderBackground();
         this.keyBindingListWidget.render(mx, my, pt);
-        this.drawCenteredString(this.font, this.title.getFormattedText(), this.width / 2, 8, 16777215);
+        this.drawCenteredString(this.font, this.title.asFormattedString(), this.width / 2, 8, 16777215);
         boolean changed = false;
         KeyBinding[] keys = this.options.keysAll;
         
@@ -177,7 +177,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         }
         // Prevent scroll overflow (the setter auto clamps)
         this.keyBindingListWidget.setScrollAmount(this.keyBindingListWidget.getScrollAmount());
-        
+
     }
     
     @Override
