@@ -1,10 +1,16 @@
 package com.blamejared.fabriccontrolling.client.gui;
 
-import net.fabricmc.api.*;
-import net.minecraft.client.gui.*;
-import net.minecraft.client.gui.menu.options.*;
-import net.minecraft.client.gui.widget.*;
-import net.minecraft.client.options.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.Element;
+import net.minecraft.client.gui.Screen;
+import net.minecraft.client.gui.menu.options.ControlsOptionsScreen;
+import net.minecraft.client.gui.menu.options.MouseOptionsScreen;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.TextFieldWidget;
+import net.minecraft.client.options.GameOption;
+import net.minecraft.client.options.GameOptions;
+import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.util.SystemUtil;
@@ -126,7 +132,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         this.resetButton.active = changed;
         search.render(mx, my, pt);
         superDraw(mx, my, pt);
-        drawCenteredString(font, "Search"/*I18n.translate("options.search")*/, this.width / 2 - (155 / 2), this.height - 29 - 39, 16777215);
+        drawCenteredString(font, I18n.translate("options.search"), this.width / 2 - (155 / 2), this.height - 29 - 39, 16777215);
     }
     
     
@@ -169,6 +175,8 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
                 }
             }
         }
+        // Prevent scroll overflow (the setter auto clamps)
+        this.keyBindingListWidget.setScrollAmount(this.keyBindingListWidget.getScrollAmount());
         
     }
     
