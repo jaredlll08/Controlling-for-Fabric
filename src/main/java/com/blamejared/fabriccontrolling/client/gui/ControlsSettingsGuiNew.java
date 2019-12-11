@@ -3,17 +3,17 @@ package com.blamejared.fabriccontrolling.client.gui;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
-import net.minecraft.client.gui.Screen;
-import net.minecraft.client.gui.menu.options.ControlsOptionsScreen;
-import net.minecraft.client.gui.menu.options.MouseOptionsScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.options.MouseOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.options.GameOption;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.options.Option;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
-import net.minecraft.util.SystemUtil;
+import net.minecraft.util.Util;
 
 import java.util.Iterator;
 import java.util.function.Predicate;
@@ -50,10 +50,10 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         this.keyBindingListWidget = new KeyBindingListWidgetNew(this, this.minecraft);
         this.children.add(this.keyBindingListWidget);
         this.setFocused(this.keyBindingListWidget);
-        this.addButton(new ButtonWidget(this.width / 2 - 155, 18, 150, 20, I18n.translate("options.mouse_settings"), (buttonWidget_1) -> {
-            this.minecraft.openScreen(new MouseOptionsScreen(this));
+        this.addButton(new ButtonWidget(this.width / 2 - 155, 18, 150, 20, I18n.translate("options.mouse_settings"), (buttonWidget) -> {
+            this.minecraft.openScreen(new MouseOptionsScreen(this, this.gameOptions));
         }));
-        this.addButton(GameOption.AUTO_JUMP.createOptionButton(this.minecraft.options, this.width / 2 - 155 + 160, 18, 150));
+        this.addButton(Option.AUTO_JUMP.createButton(this.gameOptions, this.width / 2 - 155 + 160, 18, 150));
         
         this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, "Done", var1 -> ControlsSettingsGuiNew.this.minecraft.openScreen(ControlsSettingsGuiNew.this.parent)));
         conflictBtn = this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29 - 24, 150 / 2, 20, "Show Conflicts", var1 -> {
@@ -118,7 +118,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         
         this.renderBackground();
         this.keyBindingListWidget.render(mx, my, pt);
-        this.drawCenteredString(this.font, this.title.getFormattedText(), this.width / 2, 8, 16777215);
+        this.drawCenteredString(this.font, this.title.asFormattedString(), this.width / 2, 8, 16777215);
         boolean changed = false;
         KeyBinding[] keys = this.options.keysAll;
         
@@ -242,7 +242,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
             }
             
             this.focusedBinding = null;
-            this.time = SystemUtil.getMeasuringTimeMs();
+            this.time = Util.getMeasuringTimeMs();
             KeyBinding.updateKeysByCode();
             return true;
         } else {

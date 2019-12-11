@@ -1,15 +1,19 @@
 package com.blamejared.fabriccontrolling.client.gui;
 
-import net.fabricmc.api.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
-import net.minecraft.client.gui.widget.*;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.text.TextFormat;
+import net.minecraft.client.util.TextFormat;
 import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
 public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidgetNew.Entry> {

@@ -2,8 +2,8 @@ package com.blamejared.fabriccontrolling.mixin;
 
 import com.blamejared.fabriccontrolling.client.gui.ControlsSettingsGuiNew;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.Screen;
-import net.minecraft.client.gui.menu.options.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
