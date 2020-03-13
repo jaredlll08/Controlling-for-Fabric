@@ -46,16 +46,16 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         this.lastSearch = "";
         displayType = DisplayType.ALL;
         searchType = SearchType.NAME;
-        this.search = new TextFieldWidget(font, this.width / 2 - 154, this.height - 29 - 23, 148, 18, "");
-        this.keyBindingListWidget = new KeyBindingListWidgetNew(this, this.minecraft);
+        this.search = new TextFieldWidget(textRenderer, this.width / 2 - 154, this.height - 29 - 23, 148, 18, "");
+        this.keyBindingListWidget = new KeyBindingListWidgetNew(this, this.client);
         this.children.add(this.keyBindingListWidget);
         this.setFocused(this.keyBindingListWidget);
         this.addButton(new ButtonWidget(this.width / 2 - 155, 18, 150, 20, I18n.translate("options.mouse_settings"), (buttonWidget) -> {
-            this.minecraft.openScreen(new MouseOptionsScreen(this, this.gameOptions));
+            this.client.openScreen(new MouseOptionsScreen(this, this.gameOptions));
         }));
         this.addButton(Option.AUTO_JUMP.createButton(this.gameOptions, this.width / 2 - 155 + 160, 18, 150));
         
-        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, "Done", var1 -> ControlsSettingsGuiNew.this.minecraft.openScreen(ControlsSettingsGuiNew.this.parent)));
+        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, "Done", var1 -> ControlsSettingsGuiNew.this.client.openScreen(ControlsSettingsGuiNew.this.parent)));
         conflictBtn = this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29 - 24, 150 / 2, 20, "Show Conflicts", var1 -> {
             if(displayType == DisplayType.CONFLICTS) {
                 conflictBtn.setMessage("Show Conflicts");//I18n.translate("options.showConflicts");
@@ -84,7 +84,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
             filterKeys();
         }));
         this.resetButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20, I18n.translate("controls.resetAll"), var1 -> {
-            KeyBinding[] var2 = this.minecraft.options.keysAll;
+            KeyBinding[] var2 = this.client.options.keysAll;
             int var3 = var2.length;
             
             for(int var4 = 0; var4 < var3; ++var4) {
@@ -118,7 +118,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         
         this.renderBackground();
         this.keyBindingListWidget.render(mx, my, pt);
-        this.drawCenteredString(this.font, this.title.asFormattedString(), this.width / 2, 8, 16777215);
+        this.drawCenteredString(this.textRenderer, this.title.asFormattedString(), this.width / 2, 8, 16777215);
         boolean changed = false;
         KeyBinding[] keys = this.options.keysAll;
         
@@ -132,7 +132,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         this.resetButton.active = changed;
         search.render(mx, my, pt);
         superDraw(mx, my, pt);
-        drawCenteredString(font, I18n.translate("options.search"), this.width / 2 - (155 / 2), this.height - 29 - 39, 16777215);
+        drawCenteredString(textRenderer, I18n.translate("options.search"), this.width / 2 - (155 / 2), this.height - 29 - 39, 16777215);
     }
     
     

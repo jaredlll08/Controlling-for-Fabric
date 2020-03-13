@@ -8,7 +8,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.TextFormat;
+import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
@@ -55,11 +55,13 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
         children().add(ent);
         getAllListeners().add(ent);
     }
-    
-    protected int getScrollbarPosition() {
-        return super.getScrollbarPosition() + 15;
+
+    @Override
+    protected int getScrollbarPositionX() {
+        return super.getScrollbarPositionX() + 15;
     }
-    
+
+    @Override
     public int getRowWidth() {
         return super.getRowWidth() + 32;
     }
@@ -73,7 +75,7 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
     }
     
     @Environment(EnvType.CLIENT)
-    public class KeyEntry extends KeyBindingListWidgetNew.Entry {
+    public class KeyEntry extends Entry {
         
         public final KeyBinding binding;
         public final String bindingName;
@@ -90,7 +92,7 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
             };
             
             this.resetButton = new ButtonWidget(0, 0, 50, 20, I18n.translate("controls.reset"), (buttonWidget_1) -> {
-                KeyBindingListWidgetNew.this.minecraft.options.setKeyCode(keyBinding_1, keyBinding_1.getDefaultKeyCode());
+                KeyBindingListWidgetNew.this.client.options.setKeyCode(keyBinding_1, keyBinding_1.getDefaultKeyCode());
                 KeyBinding.updateKeysByCode();
             }) {
                 protected String getNarrationMessage() {
@@ -102,11 +104,11 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
         @Override
         public void render(int int_1, int int_2, int int_3, int int_4, int int_5, int int_6, int int_7, boolean boolean_1, float float_1) {
             boolean boolean_2 = KeyBindingListWidgetNew.this.gui.focusedBinding == this.binding;
-            TextRenderer var10000 = KeyBindingListWidgetNew.this.minecraft.textRenderer;
+            TextRenderer var10000 = KeyBindingListWidgetNew.this.client.textRenderer;
             String var10001 = this.bindingName;
             float var10002 = (float) (int_3 + 90 - KeyBindingListWidgetNew.this.maxWidth);
             int var10003 = int_2 + int_5 / 2;
-            KeyBindingListWidgetNew.this.minecraft.textRenderer.getClass();
+            KeyBindingListWidgetNew.this.client.textRenderer.getClass();
             var10000.draw(var10001, var10002, (float) (var10003 - 9 / 2), 16777215);
             if(!this.binding.isDefault()) {
                 this.resetButton.x = int_3 + 190;
@@ -119,7 +121,7 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
             this.editButton.setMessage(this.binding.getLocalizedName());
             boolean boolean_3 = false;
             if(!this.binding.isNotBound()) {
-                KeyBinding[] var12 = KeyBindingListWidgetNew.this.minecraft.options.keysAll;
+                KeyBinding[] var12 = KeyBindingListWidgetNew.this.client.options.keysAll;
                 int var13 = var12.length;
                 
                 for(int var14 = 0; var14 < var13; ++var14) {
@@ -132,9 +134,9 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
             }
             
             if(boolean_2) {
-                this.editButton.setMessage(TextFormat.WHITE + "> " + TextFormat.YELLOW + this.editButton.getMessage() + TextFormat.WHITE + " <");
+                this.editButton.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.editButton.getMessage() + Formatting.WHITE + " <");
             } else if(boolean_3) {
-                this.editButton.setMessage(TextFormat.RED + this.editButton.getMessage());
+                this.editButton.setMessage(Formatting.RED + this.editButton.getMessage());
             }
             
             this.editButton.render(int_6, int_7, float_1);
@@ -170,7 +172,7 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
     }
     
     @Environment(EnvType.CLIENT)
-    public class CategoryEntry extends KeyBindingListWidgetNew.Entry {
+    public class CategoryEntry extends Entry {
         
         private final String name;
         private final int width;
@@ -193,16 +195,16 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
         @Override
         public void render(int int_1, int int_2, int int_3, int int_4, int int_5, int int_6, int int_7, boolean boolean_1, float float_1) {
             
-            TextRenderer var10000 = KeyBindingListWidgetNew.this.minecraft.textRenderer;
+            TextRenderer var10000 = KeyBindingListWidgetNew.this.client.textRenderer;
             String var10001 = this.name;
-            float var10002 = (float) (KeyBindingListWidgetNew.this.minecraft.currentScreen.width / 2 - this.width / 2);
+            float var10002 = (float) (KeyBindingListWidgetNew.this.client.currentScreen.width / 2 - this.width / 2);
             int var10003 = int_2 + int_5;
-            KeyBindingListWidgetNew.this.minecraft.textRenderer.getClass();
+            KeyBindingListWidgetNew.this.client.textRenderer.getClass();
             var10000.draw(var10001, var10002, (float) (var10003 - 9 - 1), 16777215);
             
         }
     }
     
     @Environment(EnvType.CLIENT)
-    public abstract static class Entry extends EntryListWidget.Entry<KeyBindingListWidgetNew.Entry> {}
+    public abstract static class Entry extends EntryListWidget.Entry<Entry> {}
 }

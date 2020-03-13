@@ -12,8 +12,10 @@ minecraft {
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:1.15"
-    mappings "net.fabricmc:yarn:1.15+build.1:v2"
-    modCompile "net.fabricmc:fabric-loader:0.7.2+build.174"
-    modCompile "net.fabricmc.fabric-api:fabric-api:0.4.23+build.276-1.15"
+    minecraft "com.mojang:minecraft:20w11a"
+    mappings "net.fabricmc:yarn:20w11a+build.6:v2"
+    modImplementation "net.fabricmc:fabric-loader:0.7.8+build.187"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:0.5.3+build.308-1.16"
+
+    compileOnly "com.google.code.findbugs:jsr305:3.0.2"
 }
