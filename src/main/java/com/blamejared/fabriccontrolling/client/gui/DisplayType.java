@@ -7,22 +7,22 @@ import java.util.function.Predicate;
 
 public enum DisplayType {
     ALL(keyEntry -> true), CONFLICTS(keyEntry -> {
-        if(keyEntry.binding.isNotBound()) {
+        if(keyEntry.binding.isUnbound()) {
             return false;
         }
         for(KeyBinding keyBinding : MinecraftClient.getInstance().options.keysAll) {
-            if(!keyBinding.getId().equals(keyEntry.binding.getId())) {
-                if(keyBinding.getName().equals(keyEntry.binding.getName())) {
+            if(!keyBinding.getTranslationKey().equals(keyEntry.binding.getTranslationKey())) {
+                if(keyBinding.getBoundKeyTranslationKey().equals(keyEntry.binding.getBoundKeyTranslationKey())) {
                     return true;
                 }
             }
         }
         return false;
     }), UNBOUND(keyEntry -> {
-        return keyEntry.binding.isNotBound();
+        return keyEntry.binding.isUnbound();
     });
     
-    private Predicate<KeyBindingListWidgetNew.KeyEntry> pred;
+    private final Predicate<KeyBindingListWidgetNew.KeyEntry> pred;
     
     
     DisplayType(Predicate<KeyBindingListWidgetNew.KeyEntry> pred) {

@@ -3,11 +3,14 @@ package com.blamejared.fabriccontrolling.client.gui;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.options.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Formatting;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -40,7 +43,7 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
                 this.addListener(new CategoryEntry(var9));
             }
             
-            int var10 = mc.textRenderer.getStringWidth(I18n.translate(var8.getId()));
+            int var10 = mc.textRenderer.getWidth(I18n.translate(var8.getTranslationKey()));
             if(var10 > this.maxWidth) {
                 this.maxWidth = var10;
             }
@@ -84,62 +87,59 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
         
         private KeyEntry(final KeyBinding keyBinding_1) {
             this.binding = keyBinding_1;
-            this.bindingName = I18n.translate(keyBinding_1.getId());
-            this.editButton = new ButtonWidget(0, 0, 75, 20, this.bindingName, (buttonWidget_1) -> KeyBindingListWidgetNew.this.gui.focusedBinding = keyBinding_1) {
-                protected String getNarrationMessage() {
-                    return keyBinding_1.isNotBound() ? I18n.translate("narrator.controls.unbound", KeyEntry.this.bindingName) : I18n.translate("narrator.controls.bound", KeyEntry.this.bindingName, super.getNarrationMessage());
+            this.bindingName = I18n.translate(keyBinding_1.getTranslationKey());
+            this.editButton = new ButtonWidget(0, 0, 75, 20, new LiteralText(this.bindingName), (buttonWidget_1) -> KeyBindingListWidgetNew.this.gui.focusedBinding = keyBinding_1) {
+                protected MutableText getNarrationMessage() {
+                    return keyBinding_1.isUnbound() ? new TranslatableText("narrator.controls.unbound", KeyEntry.this.bindingName) : new TranslatableText("narrator.controls.bound", KeyEntry.this.bindingName, super.getNarrationMessage());
                 }
             };
             
-            this.resetButton = new ButtonWidget(0, 0, 50, 20, I18n.translate("controls.reset"), (buttonWidget_1) -> {
-                KeyBindingListWidgetNew.this.client.options.setKeyCode(keyBinding_1, keyBinding_1.getDefaultKeyCode());
+            this.resetButton = new ButtonWidget(0, 0, 50, 20, new TranslatableText("controls.reset"), (buttonWidget_1) -> {
+                KeyBindingListWidgetNew.this.client.options.setKeyCode(keyBinding_1, keyBinding_1.getDefaultKey());
                 KeyBinding.updateKeysByCode();
             }) {
-                protected String getNarrationMessage() {
-                    return I18n.translate("narrator.controls.reset", KeyEntry.this.bindingName);
+                protected MutableText getNarrationMessage() {
+                    return new TranslatableText("narrator.controls.reset", KeyEntry.this.bindingName);
                 }
             };
         }
         
         @Override
-        public void render(int int_1, int int_2, int int_3, int int_4, int int_5, int int_6, int int_7, boolean boolean_1, float float_1) {
+        public void render(MatrixStack matrices, int int_1, int int_2, int int_3, int int_4, int int_5, int int_6, int int_7, boolean boolean_1, float float_1) {
             boolean boolean_2 = KeyBindingListWidgetNew.this.gui.focusedBinding == this.binding;
-            TextRenderer var10000 = KeyBindingListWidgetNew.this.client.textRenderer;
-            String var10001 = this.bindingName;
-            float var10002 = (float) (int_3 + 90 - KeyBindingListWidgetNew.this.maxWidth);
-            int var10003 = int_2 + int_5 / 2;
-            KeyBindingListWidgetNew.this.client.textRenderer.getClass();
-            var10000.draw(var10001, var10002, (float) (var10003 - 9 / 2), 16777215);
+            KeyBindingListWidgetNew.this.client.textRenderer.draw(matrices, this.bindingName, (float) (int_3 + 90 - KeyBindingListWidgetNew.this.maxWidth), (float) (int_2 + int_5 / 2 - 9 / 2), 0xffffff);
             if(!this.binding.isDefault()) {
                 this.resetButton.x = int_3 + 190;
                 this.resetButton.y = int_2;
                 this.resetButton.active = !this.binding.isDefault();
-                this.resetButton.render(int_6, int_7, float_1);
+                this.resetButton.render(matrices, int_6, int_7, float_1);
             }
             this.editButton.x = int_3 + 105;
             this.editButton.y = int_2;
-            this.editButton.setMessage(this.binding.getLocalizedName());
+            this.editButton.setMessage(this.binding.getBoundKeyLocalizedText());
             boolean boolean_3 = false;
-            if(!this.binding.isNotBound()) {
+            if(!this.binding.isUnbound()) {
                 KeyBinding[] var12 = KeyBindingListWidgetNew.this.client.options.keysAll;
-                int var13 = var12.length;
-                
-                for(int var14 = 0; var14 < var13; ++var14) {
-                    KeyBinding keyBinding_1 = var12[var14];
-                    if(keyBinding_1 != this.binding && this.binding.equals(keyBinding_1)) {
+
+                for (KeyBinding keyBinding_1 : var12) {
+                    if (keyBinding_1 != this.binding && this.binding.equals(keyBinding_1)) {
                         boolean_3 = true;
                         break;
                     }
                 }
             }
-            
-            if(boolean_2) {
-                this.editButton.setMessage(Formatting.WHITE + "> " + Formatting.YELLOW + this.editButton.getMessage() + Formatting.WHITE + " <");
-            } else if(boolean_3) {
-                this.editButton.setMessage(Formatting.RED + this.editButton.getMessage());
+
+            if (boolean_2) {
+                this.editButton.setMessage(
+                        new LiteralText("> ").formatted(Formatting.WHITE)
+                                .append(((MutableText) this.editButton.getMessage()).formatted(Formatting.YELLOW))
+                                .append(new LiteralText(" <").formatted(Formatting.WHITE))
+                );
+            } else if (boolean_3) {
+                this.editButton.setMessage(((MutableText) this.editButton.getMessage()).formatted(Formatting.RED));
             }
             
-            this.editButton.render(int_6, int_7, float_1);
+            this.editButton.render(matrices, int_6, int_7, float_1);
         }
         
         
@@ -179,7 +179,7 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
         
         public CategoryEntry(String name) {
             this.name = I18n.translate(name);
-            this.width = KeyBindingListWidgetNew.this.client.textRenderer.getStringWidth(this.name);
+            this.width = KeyBindingListWidgetNew.this.client.textRenderer.getWidth(this.name);
         }
         
         
@@ -193,15 +193,13 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
         }
         
         @Override
-        public void render(int int_1, int int_2, int int_3, int int_4, int int_5, int int_6, int int_7, boolean boolean_1, float float_1) {
-            
-            TextRenderer var10000 = KeyBindingListWidgetNew.this.client.textRenderer;
-            String var10001 = this.name;
-            float var10002 = (float) (KeyBindingListWidgetNew.this.client.currentScreen.width / 2 - this.width / 2);
-            int var10003 = int_2 + int_5;
-            KeyBindingListWidgetNew.this.client.textRenderer.getClass();
-            var10000.draw(var10001, var10002, (float) (var10003 - 9 - 1), 16777215);
-            
+        public void render(MatrixStack matrices, int int_1, int int_2, int int_3, int int_4, int int_5, int int_6, int int_7, boolean boolean_1, float float_1) {
+            KeyBindingListWidgetNew.this.client.textRenderer.draw(
+                    matrices,
+                    this.name,
+                    (float) (KeyBindingListWidgetNew.this.client.currentScreen.width / 2 - this.width / 2),
+                    (float) ((int_2 + int_5) - 9 - 1),
+                    0xffffff);
         }
     }
     
