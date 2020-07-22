@@ -1,4 +1,4 @@
-package com.blamejared.fabriccontrolling;
+package com.blamejared.controlling;
 
 import net.fabricmc.api.ClientModInitializer;
 

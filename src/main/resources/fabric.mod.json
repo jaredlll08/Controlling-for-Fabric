@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "fabriccontrolling",
-  "name": "Fabric Controlling",
-  "version": "1.1.1",
+  "id": "controlling",
+  "name": "Controlling For Fabric",
+  "version": "1.1.2",
   "side": "client",
   "entrypoints": {
-    "client": ["com.blamejared.fabriccontrolling.Controlling"]
+    "client": ["com.blamejared.controlling.Controlling"]
   },
   "mixins": [
-    "fabriccontrolling.mixins.json"
+    "controlling.mixins.json"
   ]
 }

@@ -1,6 +1,6 @@
-package com.blamejared.fabriccontrolling.mixin;
+package com.blamejared.controlling.mixin;
 
-import com.blamejared.fabriccontrolling.client.gui.ControlsSettingsGuiNew;
+import com.blamejared.controlling.client.gui.ControlsSettingsGuiNew;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;

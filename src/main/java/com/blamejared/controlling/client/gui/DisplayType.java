@@ -1,4 +1,4 @@
-package com.blamejared.fabriccontrolling.client.gui;
+package com.blamejared.controlling.client.gui;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.options.KeyBinding;

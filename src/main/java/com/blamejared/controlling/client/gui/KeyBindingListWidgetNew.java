@@ -1,4 +1,4 @@
-package com.blamejared.fabriccontrolling.client.gui;
+package com.blamejared.controlling.client.gui;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;

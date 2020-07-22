@@ -1,6 +1,6 @@
 {
   "required": true,
-  "package": "com.blamejared.fabriccontrolling.mixin",
+  "package": "com.blamejared.controlling.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
     "OpenGuiMixin"
