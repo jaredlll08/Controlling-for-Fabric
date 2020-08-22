@@ -44,7 +44,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         this.parent = var1;
         this.options = var2;
     }
-    
+
     protected void init() {
         this.lastSearch = "";
         displayType = DisplayType.ALL;
@@ -122,7 +122,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         
         this.renderBackground(matrices);
         this.keyBindingListWidget.render(matrices, mx, my, pt);
-        this.drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 16777215);
+        drawCenteredText(matrices, this.textRenderer, this.title, this.width / 2, 8, 16777215);
         boolean changed = false;
         KeyBinding[] keys = this.options.keysAll;
         
