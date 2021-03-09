@@ -3,9 +3,9 @@
   "options.showAll": "显示全部",
   "options.showConflicts": "显示冲突",
   "options.showNone": "显示未绑定",
-  "options.availableKeys": "可用密钥",
+  "options.availableKeys": "可用按键",
   "options.sort": "排序",
   "options.category": "类别",
-  "options.key": "钥匙",
-  "options.toggleFree": "切换自由"
+  "options.key": "按键",
+  "options.toggleFree": "自由切换"
 }
