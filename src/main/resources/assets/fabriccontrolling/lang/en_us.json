@@ -1,5 +1,5 @@
 {
-  "options.search": "Search",
+  "options.search": "Search by: ",
   "options.showAll": "Show All",
   "options.showConflicts": "Show Conflicts",
   "options.showNone": "Show Unbound",
@@ -7,5 +7,9 @@
   "options.sort": "Sort",
   "options.category": "Category",
   "options.key": "Key",
-  "options.toggleFree": "Toggle Free"
+  "options.sortNone": "None",
+  "options.sortAZ": "A->Z",
+  "options.sortZA": "Z->A",
+  "options.toggleFree": "Toggle Free",
+  "options.confirmReset": "Click to confirm reset!"
 }

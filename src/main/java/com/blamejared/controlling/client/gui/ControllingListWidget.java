@@ -1,43 +1,66 @@
 package com.blamejared.controlling.client.gui;
 
+import com.blamejared.controlling.mixin.CategoryEntryAccessor;
+import com.blamejared.controlling.mixin.KeyBindingEntryAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
-import net.minecraft.client.gui.screen.option.ControlsListWidget;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.gui.widget.EntryListWidget;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.MutableText;
 import net.minecraft.text.TranslatableText;
-import net.minecraft.util.Formatting;
-import org.apache.commons.lang3.ArrayUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.function.Predicate;
 
 @Environment(EnvType.CLIENT)
-public class ControllingListWidget extends ControlsListWidget {
+public class ControllingListWidget extends CustomListWidget {
     
-    private List<Entry> allListeners;
-    
-    public ControllingListWidget(ControlsSettingsGuiNew parent, MinecraftClient mc) {
+    public ControllingListWidget(ControllingOptionsScreen parent, MinecraftClient mc) {
         super(parent, mc);
         this.bottom = parent.height - 80;
     }
 
-    @Override
-    protected int addEntry(ControlsListWidget.Entry entry) {
-        this.getAllListeners().add(entry);
-        return super.addEntry(entry);
-    }
+    void filterKeys(String lastSearch, DisplayMode displayMode, SearchType searchType, SortOrder sortOrder) {
+        this.children().clear();
+        if(lastSearch.isEmpty() && displayMode == DisplayMode.ALL && sortOrder == SortOrder.NONE) {
+            this.children().addAll(this.getAllEntries());
+            return;
+        }
 
-    public List<Entry> getAllListeners() {
-        if (this.allListeners == null) this.allListeners = new ArrayList<>();
-        return allListeners;
+        Predicate<KeyBinding> filters = displayMode.getFilter();
+        if(!lastSearch.isEmpty()) {
+            filters = switch (searchType) {
+                case NAME -> filters.and(key -> I18n.translate(key.getTranslationKey()).toLowerCase().contains(lastSearch.toLowerCase()));
+                case KEY -> filters.and(key -> I18n.translate(key.getBoundKeyTranslationKey()).toLowerCase().contains(lastSearch.toLowerCase()));
+                case CATEGORY -> filters.and(key -> I18n.translate(key.getCategory()).toLowerCase().contains(lastSearch.toLowerCase()));
+            };
+        }
+
+        for(Entry entry : this.getAllEntries()) {
+            if(searchType == SearchType.CATEGORY && sortOrder == SortOrder.NONE && displayMode == DisplayMode.ALL) {
+                if(!(entry instanceof KeyBindingEntryAccessor keyEntry) || filters.test(keyEntry.binding())) {
+                    this.children().add(entry);
+                }
+            } else if (entry instanceof KeyBindingEntryAccessor keyEntry && filters.test(keyEntry.binding())) {
+                this.children().add(entry);
+            }
+        }
+
+        if(searchType == SearchType.CATEGORY && sortOrder == SortOrder.NONE && displayMode == DisplayMode.ALL) {
+            this.children().removeIf(entry -> {
+                if(entry instanceof CategoryEntry centry) {
+                    for(Entry child : this.children()) {
+                        if(child instanceof KeyBindingEntry childEntry) {
+                            if(new TranslatableText(((KeyBindingEntryAccessor) childEntry).binding().getCategory()).equals(((CategoryEntryAccessor) centry).text())) {
+                                return false;
+                            }
+                        }
+                    }
+                    return true;
+                }
+                return false;
+            });
+        }
+
+        sortOrder.sort(this.children());
     }
 }

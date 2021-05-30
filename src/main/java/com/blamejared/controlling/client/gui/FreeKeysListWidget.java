@@ -11,14 +11,13 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.TranslatableText;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GuiFreeKeysList extends GuiCustomList {
+public class FreeKeysListWidget extends CustomListWidget {
     
     private final ControlsOptionsScreen controlsScreen;
     private final MinecraftClient mc;
@@ -26,7 +25,7 @@ public class GuiFreeKeysList extends GuiCustomList {
     
     List<KeyBinding> keyBindings;
     
-    public GuiFreeKeysList(ControlsOptionsScreen controls, MinecraftClient mcIn) {
+    public FreeKeysListWidget(ControlsOptionsScreen controls, MinecraftClient mcIn) {
         super(controls, mcIn);
         this.width = controls.width + 45;
         this.height = controls.height;
@@ -36,18 +35,22 @@ public class GuiFreeKeysList extends GuiCustomList {
         this.controlsScreen = controls;
         this.mc = mcIn;
         children().clear();
-        allEntries = new ArrayList<>();
         keyBindings = Arrays.stream(mc.options.keysAll).collect(Collectors.toList());
         
         recalculate();
     }
-    
+
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+    }
+
     public void recalculate() {
         
-        children().clear();
-        allEntries.clear();
+        this.children().clear();
+        this.getAllEntries().clear();
         
-        add(new HeaderEntry("Available Keys"));
+        this.addEntry(new HeaderEntry("Available Keys"));
         KeyAccessor.getKeys().values().stream().filter(input -> {
             return !input.toString().startsWith("key.keyboard.world");
         }).sorted(Comparator.comparing(o -> o.getLocalizedText().getString())).forEach(input -> {
@@ -56,7 +59,7 @@ public class GuiFreeKeysList extends GuiCustomList {
                 if(i > this.maxListLabelWidth) {
                     this.maxListLabelWidth = i;
                 }
-                add(new InputEntry(input));
+                this.addEntry(new InputEntry(input));
             }
         });
     }
@@ -68,10 +71,30 @@ public class GuiFreeKeysList extends GuiCustomList {
     
     @Override
     public int getRowWidth() {
-        
         return super.getRowWidth() + 32;
     }
-    
+
+    void filterKeys(String lastSearch) {
+        this.children().clear();
+        if(lastSearch.isEmpty()) {
+            this.children().addAll(this.getAllEntries());
+            return;
+        }
+
+        this.setScrollAmount(0);
+
+        for(Entry entry : getAllEntries()) {
+            if(entry instanceof InputEntry inputEntry) {
+                if(inputEntry.input.toString().toLowerCase().contains(lastSearch.toLowerCase())) {
+                    this.children().add(entry);
+                }
+            } else {
+                this.children().add(entry);
+            }
+
+        }
+    }
+
     public class InputEntry extends Entry {
         
         private final InputUtil.Key input;
@@ -99,8 +122,8 @@ public class GuiFreeKeysList extends GuiCustomList {
             String str = this.input.toString() + " - " + input.getCode();// + " - " + input.func_237520_d_().getString() + " - " + input.getKeyCode();
             int length = mc.textRenderer.getWidth(input.getLocalizedText());
             
-            GuiFreeKeysList.this.mc.textRenderer.draw(stack, str, x, (float) (y + p_render_5_ / 2 - 9 / 2), 0xffffff);
-            GuiFreeKeysList.this.controlsScreen.renderTooltip(stack, Collections.singletonList(input.getLocalizedText()), x + p_render_4_ - (length), y + p_render_5_);
+            FreeKeysListWidget.this.mc.textRenderer.draw(stack, str, x, (float) (y + p_render_5_ / 2 - 9 / 2), 0xffffff);
+            FreeKeysListWidget.this.controlsScreen.renderTooltip(stack, Collections.singletonList(input.getLocalizedText()), x + p_render_4_ - (length), y + p_render_5_);
         }
         
     }

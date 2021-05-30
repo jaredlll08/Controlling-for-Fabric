@@ -1,19 +1,17 @@
 package com.blamejared.controlling.client.gui;
 
-import com.blamejared.controlling.mixin.KeyBindingEntryAccessor;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.option.KeyBinding;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 
 public enum DisplayMode {
-    ALL(keyEntry -> true), NONE(keyEntry -> {
-        return ((KeyBindingEntryAccessor) keyEntry).binding().isUnbound();
-    }), CONFLICTS(keyEntry -> {
-        for(KeyBinding key : MinecraftClient.getInstance().options.keysAll) {
-            if(!key.getTranslationKey().equals(((KeyBindingEntryAccessor) keyEntry).binding().getTranslationKey()) || key.isUnbound()) {
-                if(key.equals(((KeyBindingEntryAccessor) keyEntry).binding())) {
+    ALL(key -> true), NONE(KeyBinding::isUnbound), CONFLICTING(key -> {
+        for(KeyBinding k : MinecraftClient.getInstance().options.keysAll) {
+            if(!Objects.equals(key.getTranslationKey(), k.getTranslationKey()) && !k.isUnbound()) {
+                // this is not actually "equals", it's more like "conflicts"
+                if(k.equals(key)) {
                     return true;
                 }
             }
@@ -21,15 +19,15 @@ public enum DisplayMode {
         return false;
     });
     
-    private final Predicate<ControlsListWidget.KeyBindingEntry> pred;
+    private final Predicate<KeyBinding> filter;
     
     
-    DisplayMode(Predicate<ControlsListWidget.KeyBindingEntry> pred) {
-        this.pred = pred;
+    DisplayMode(Predicate<KeyBinding> filter) {
+        this.filter = filter;
     }
     
     
-    public Predicate<ControlsListWidget.KeyBindingEntry> getPred() {
-        return pred;
+    public Predicate<KeyBinding> getFilter() {
+        return filter;
     }
 }
