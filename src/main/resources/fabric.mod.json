@@ -3,7 +3,7 @@
   "id": "controlling",
   "name": "Controlling For Fabric",
   "version": "1.1.2",
-  "side": "client",
+  "environment": "client",
   "entrypoints": {
     "client": ["com.blamejared.controlling.Controlling"]
   },
