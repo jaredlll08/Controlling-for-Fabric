@@ -7,5 +7,10 @@
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "mixins": [
+    "KeyAccessor",
+    "KeyBindingAccessor",
+    "KeyBindingEntryAccessor"
+  ]
 }

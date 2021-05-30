@@ -1,9 +1,11 @@
 package com.blamejared.controlling.client.gui;
 
+import com.blamejared.controlling.mixin.KeyBindingEntryAccessor;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.gui.screen.option.ControlsListWidget;
 import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
 import net.minecraft.client.gui.screen.option.MouseOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
@@ -27,13 +29,13 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     
     private final Screen parent;
     private final GameOptions options;
-    private KeyBindingListWidgetNew keyBindingListWidget;
+    private ControllingListWidget keyBindingListWidget;
     private ButtonWidget resetButton;
     
     
     private TextFieldWidget search;
     private String lastSearch;
-    private DisplayType displayType;
+    private DisplayMode displayMode;
     public ButtonWidget noneBtn;
     public ButtonWidget conflictBtn;
     public SearchType searchType;
@@ -48,10 +50,10 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     @Override
     protected void init() {
         this.lastSearch = "";
-        displayType = DisplayType.ALL;
+        displayMode = DisplayMode.ALL;
         searchType = SearchType.NAME;
         this.search = new TextFieldWidget(textRenderer, this.width / 2 - 154, this.height - 29 - 23, 148, 18, new LiteralText(""));
-        this.keyBindingListWidget = new KeyBindingListWidgetNew(this, this.client);
+        this.keyBindingListWidget = new ControllingListWidget(this, this.client);
         this.addSelectableChild(this.keyBindingListWidget);
         this.setFocused(this.keyBindingListWidget);
         this.addDrawableChild(new ButtonWidget(this.width / 2 - 155, 18, 150, 20, new TranslatableText("options.mouse_settings"), (buttonWidget) -> {
@@ -61,22 +63,22 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         
         this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, new TranslatableText("gui.done"), var1 -> ControlsSettingsGuiNew.this.client.openScreen(ControlsSettingsGuiNew.this.parent)));
         conflictBtn = this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29 - 24, 150 / 2, 20, new TranslatableText("options.showConflicts"), var1 -> {
-            if(displayType == DisplayType.CONFLICTS) {
+            if(displayMode == DisplayMode.CONFLICTS) {
                 conflictBtn.setMessage(new TranslatableText("options.showConflicts"));
-                displayType = DisplayType.ALL;
+                displayMode = DisplayMode.ALL;
             } else {
-                displayType = DisplayType.CONFLICTS;
+                displayMode = DisplayMode.CONFLICTS;
                 conflictBtn.setMessage(new TranslatableText("options.showAll"));
                 noneBtn.setMessage(new TranslatableText("options.showNone"));
             }
             filterKeys();
         }));
         noneBtn = this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160 + 76, this.height - 29 - 24, 150 / 2, 20, new TranslatableText("options.showNone"), var1 -> {
-            if(displayType == DisplayType.UNBOUND) {
+            if(displayMode == DisplayMode.NONE) {
                 noneBtn.setMessage(new TranslatableText("options.showNone"));
-                displayType = DisplayType.ALL;
+                displayMode = DisplayMode.ALL;
             } else {
-                displayType = DisplayType.UNBOUND;
+                displayMode = DisplayMode.NONE;
                 noneBtn.setMessage(new TranslatableText("options.showAll"));
                 conflictBtn.setMessage(new TranslatableText("options.showConflicts"));
             }
@@ -153,31 +155,28 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     public void filterKeys() {
         lastSearch = search.getText();
         keyBindingListWidget.children().clear();
-        if(displayType == DisplayType.ALL && lastSearch.isEmpty()) {
+        if(displayMode == DisplayMode.ALL && lastSearch.isEmpty()) {
             keyBindingListWidget.children().addAll(keyBindingListWidget.getAllListeners());
             return;
         }
-        Predicate<KeyBindingListWidgetNew.KeyEntry> predicate = displayType.getPred();
+        Predicate<ControlsListWidget.KeyBindingEntry> predicate = displayMode.getPred();
         if(!lastSearch.isEmpty()) {
             switch(searchType) {
                 case NAME:
-                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.bindingName).toLowerCase().contains(lastSearch.toLowerCase()));
+                    predicate = predicate.and(keyEntry -> ((KeyBindingEntryAccessor) keyEntry).bindingName().getString().toLowerCase().contains(lastSearch.toLowerCase()));
                     break;
                 case KEY:
-                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.binding.getTranslationKey()).toLowerCase().contains(lastSearch.toLowerCase()));
+                    predicate = predicate.and(keyEntry -> I18n.translate(((KeyBindingEntryAccessor) keyEntry).binding().getTranslationKey()).toLowerCase().contains(lastSearch.toLowerCase()));
                     break;
                 case CATEGORY:
-                    predicate = predicate.and(keyEntry -> I18n.translate(keyEntry.binding.getCategory()).toLowerCase().contains(lastSearch.toLowerCase()));
+                    predicate = predicate.and(keyEntry -> I18n.translate(((KeyBindingEntryAccessor) keyEntry).binding().getCategory()).toLowerCase().contains(lastSearch.toLowerCase()));
                     break;
             }
         }
         
-        for(KeyBindingListWidgetNew.Entry entry : keyBindingListWidget.getAllListeners()) {
-            if(entry instanceof KeyBindingListWidgetNew.KeyEntry) {
-                KeyBindingListWidgetNew.KeyEntry ent = (KeyBindingListWidgetNew.KeyEntry) entry;
-                if(predicate.test(ent)) {
-                    keyBindingListWidget.children().add(ent);
-                }
+        for(ControllingListWidget.Entry entry : keyBindingListWidget.getAllListeners()) {
+            if (entry instanceof ControlsListWidget.KeyBindingEntry ent && predicate.test(ent)) {
+                keyBindingListWidget.children().add(ent);
             }
         }
         // Prevent scroll overflow (the setter auto clamps)
