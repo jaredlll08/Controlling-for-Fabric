@@ -4,13 +4,13 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.Element;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.gui.screen.options.ControlsOptionsScreen;
-import net.minecraft.client.gui.screen.options.MouseOptionsScreen;
+import net.minecraft.client.gui.screen.option.ControlsOptionsScreen;
+import net.minecraft.client.gui.screen.option.MouseOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
-import net.minecraft.client.options.GameOptions;
-import net.minecraft.client.options.KeyBinding;
-import net.minecraft.client.options.Option;
+import net.minecraft.client.option.GameOptions;
+import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.option.Option;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.util.math.MatrixStack;
@@ -45,21 +45,22 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
         this.options = var2;
     }
 
+    @Override
     protected void init() {
         this.lastSearch = "";
         displayType = DisplayType.ALL;
         searchType = SearchType.NAME;
         this.search = new TextFieldWidget(textRenderer, this.width / 2 - 154, this.height - 29 - 23, 148, 18, new LiteralText(""));
         this.keyBindingListWidget = new KeyBindingListWidgetNew(this, this.client);
-        this.children.add(this.keyBindingListWidget);
+        this.addSelectableChild(this.keyBindingListWidget);
         this.setFocused(this.keyBindingListWidget);
-        this.addButton(new ButtonWidget(this.width / 2 - 155, 18, 150, 20, new TranslatableText("options.mouse_settings"), (buttonWidget) -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 155, 18, 150, 20, new TranslatableText("options.mouse_settings"), (buttonWidget) -> {
             this.client.openScreen(new MouseOptionsScreen(this, this.gameOptions));
         }));
-        this.addButton(Option.AUTO_JUMP.createButton(this.gameOptions, this.width / 2 - 155 + 160, 18, 150));
+        this.addDrawableChild(Option.AUTO_JUMP.createButton(this.gameOptions, this.width / 2 - 155 + 160, 18, 150));
         
-        this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, new TranslatableText("gui.done"), var1 -> ControlsSettingsGuiNew.this.client.openScreen(ControlsSettingsGuiNew.this.parent)));
-        conflictBtn = this.addButton(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29 - 24, 150 / 2, 20, new TranslatableText("options.showConflicts"), var1 -> {
+        this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29, 150, 20, new TranslatableText("gui.done"), var1 -> ControlsSettingsGuiNew.this.client.openScreen(ControlsSettingsGuiNew.this.parent)));
+        conflictBtn = this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160, this.height - 29 - 24, 150 / 2, 20, new TranslatableText("options.showConflicts"), var1 -> {
             if(displayType == DisplayType.CONFLICTS) {
                 conflictBtn.setMessage(new TranslatableText("options.showConflicts"));
                 displayType = DisplayType.ALL;
@@ -70,7 +71,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
             }
             filterKeys();
         }));
-        noneBtn = this.addButton(new ButtonWidget(this.width / 2 - 155 + 160 + 76, this.height - 29 - 24, 150 / 2, 20, new TranslatableText("options.showNone"), var1 -> {
+        noneBtn = this.addDrawableChild(new ButtonWidget(this.width / 2 - 155 + 160 + 76, this.height - 29 - 24, 150 / 2, 20, new TranslatableText("options.showNone"), var1 -> {
             if(displayType == DisplayType.UNBOUND) {
                 noneBtn.setMessage(new TranslatableText("options.showNone"));
                 displayType = DisplayType.ALL;
@@ -81,12 +82,12 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
             }
             filterKeys();
         }));
-        sTypeBtn = this.addButton(new ButtonWidget(this.width / 2 - (155 / 2) + 20, this.height - 29 - 39 - (5), 53, 20, new TranslatableText(searchType.niceName()), var1 -> {
+        sTypeBtn = this.addDrawableChild(new ButtonWidget(this.width / 2 - (155 / 2) + 20, this.height - 29 - 39 - (5), 53, 20, new TranslatableText(searchType.niceName()), var1 -> {
             searchType = searchType.cycle();
             var1.setMessage(new TranslatableText(searchType.niceName()));
             filterKeys();
         }));
-        this.resetButton = this.addButton(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20, new TranslatableText("controls.resetAll"), var1 -> {
+        this.resetButton = this.addDrawableChild(new ButtonWidget(this.width / 2 - 155, this.height - 29, 150, 20, new TranslatableText("controls.resetAll"), var1 -> {
             KeyBinding[] var2 = this.client.options.keysAll;
             int var3 = var2.length;
             
@@ -299,8 +300,10 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
     
     public void superDraw(MatrixStack matrices, int var1, int var2, float var3) {
         int var4;
-        for(var4 = 0; var4 < this.buttons.size(); ++var4) {
-            ((ButtonWidget) this.buttons.get(var4)).render(matrices, var1, var2, var3);
+        for(var4 = 0; var4 < this.children().size(); ++var4) {
+            if (this.children().get(var4) instanceof ButtonWidget button) {
+                button.render(matrices, var1, var2, var3);
+            }
         }
         
         //        for(var4 = 0; var4 < this.labelWidgets.size(); ++var4) {

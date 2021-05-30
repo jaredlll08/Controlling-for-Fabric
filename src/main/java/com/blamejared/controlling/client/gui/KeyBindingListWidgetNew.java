@@ -3,9 +3,10 @@ package com.blamejared.controlling.client.gui;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.narration.NarrationMessageBuilder;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.EntryListWidget;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.LiteralText;
@@ -76,7 +77,12 @@ public class KeyBindingListWidgetNew extends EntryListWidget<KeyBindingListWidge
     public void setAllListeners(List<Entry> allListeners) {
         this.allListeners = allListeners;
     }
-    
+
+    @Override
+    public void appendNarrations(NarrationMessageBuilder builder) {
+
+    }
+
     @Environment(EnvType.CLIENT)
     public class KeyEntry extends Entry {
         

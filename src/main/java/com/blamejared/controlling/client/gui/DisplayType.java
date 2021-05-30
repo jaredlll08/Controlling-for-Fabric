@@ -1,7 +1,7 @@
 package com.blamejared.controlling.client.gui;
 
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.KeyBinding;
+import net.minecraft.client.option.KeyBinding;
 
 import java.util.function.Predicate;
 
