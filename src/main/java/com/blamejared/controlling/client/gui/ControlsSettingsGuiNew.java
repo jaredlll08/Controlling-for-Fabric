@@ -166,7 +166,7 @@ public class ControlsSettingsGuiNew extends ControlsOptionsScreen {
                     predicate = predicate.and(keyEntry -> ((KeyBindingEntryAccessor) keyEntry).bindingName().getString().toLowerCase().contains(lastSearch.toLowerCase()));
                     break;
                 case KEY:
-                    predicate = predicate.and(keyEntry -> I18n.translate(((KeyBindingEntryAccessor) keyEntry).binding().getTranslationKey()).toLowerCase().contains(lastSearch.toLowerCase()));
+                    predicate = predicate.and(keyEntry -> I18n.translate(((KeyBindingEntryAccessor) keyEntry).binding().getBoundKeyTranslationKey()).toLowerCase().contains(lastSearch.toLowerCase()));
                     break;
                 case CATEGORY:
                     predicate = predicate.and(keyEntry -> I18n.translate(((KeyBindingEntryAccessor) keyEntry).binding().getCategory()).toLowerCase().contains(lastSearch.toLowerCase()));
